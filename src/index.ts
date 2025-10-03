@@ -14,7 +14,7 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({ 
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'https://nextjs-prisma-portfolio-frontend.vercel.app'],
   credentials: true
 })); // Update for prod with your domain
 app.use(express.json());
