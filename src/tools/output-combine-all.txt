@@ -20,7 +20,7 @@ export const login = async (req: Request, res: Response) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -190,7 +190,10 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: 'http://localhost:3000' })); // Update for prod with your domain
+app.use(cors({ 
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+})); // Update for prod with your domain
 app.use(express.json());
 
 // Seed admin if no users exist
