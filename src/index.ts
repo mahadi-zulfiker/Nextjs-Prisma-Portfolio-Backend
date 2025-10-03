@@ -13,19 +13,25 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: 'http://localhost:3000' })); // Update for production
+app.use(cors({ origin: 'http://localhost:3000' })); // Update for prod with your domain
 app.use(express.json());
 
-// Seed admin on start (for dev; remove or secure for prod)
+// Seed admin if no users exist
 seedAdmin(prisma);
 
 // Routes
-app.use('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send("Welcome to the Portfolio API");
 });
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/projects', projectRoutes);
+
+// Global error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

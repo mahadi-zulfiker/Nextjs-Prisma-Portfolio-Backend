@@ -8,8 +8,8 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password too short'),
 });
 
 export const login = async (req: Request, res: Response) => {
@@ -22,6 +22,9 @@ export const login = async (req: Request, res: Response) => {
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
-    res.status(400).json({ error: 'Invalid input' });
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.errors[0].message });
+    }
+    res.status(500).json({ error: 'Server error' });
   }
 };
